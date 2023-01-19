@@ -27,6 +27,8 @@ extern "C"{
 
 #include <gscam/gscam.h>
 
+#include <string>
+
 namespace gscam {
 
   GSCam::GSCam(ros::NodeHandle nh_camera, ros::NodeHandle nh_private) :
@@ -223,8 +225,16 @@ namespace gscam {
         jpeg_pub_ = nh_.advertise<sensor_msgs::CompressedImage>("camera/image_raw/compressed",1);
         cinfo_pub_ = nh_.advertise<sensor_msgs::CameraInfo>("camera/camera_info",1);
     } else {
-        camera_pub_ = image_transport_.advertiseCamera("camera/image_raw", 1);
+        if ( camera_name_.compare("default") ) {
+            std::string camname_;
+            camname_ = camera_name_ + "/image_raw"; 
+            camera_pub_ = image_transport_.advertiseCamera(camname_.c_str(), 1);
+        }
+        else {
+            camera_pub_ = image_transport_.advertiseCamera("camera/image_raw", 1);
+        }
     }
+
 
     return true;
   }
